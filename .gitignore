@@ -1,0 +1,6 @@
+doc/*
+.directory
+*.d
+*.o
+*.bin
+*.hex
