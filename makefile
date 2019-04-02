@@ -10,13 +10,13 @@ export BUILD_DIR=
 
 ifeq ($(BUILD_TYPE),)
 	BUILD_TYPE=debug
-	OPTIM=-Os
+	OPTIM=-O3
 else ifeq ($(BUILD_TYPE),debug)
 	BUILD_TYPE=debug
-	OPTIM=-Os
+	OPTIM=-O3
 else ifeq ($(BUILD_TYPE),optim)
 	BUILD_TYPE=optim
-	OPTIM=-O2 -flto
+	OPTIM=-O3 -flto
 endif
 
 ifeq ($(BUILD_DIR),)

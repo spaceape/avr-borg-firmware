@@ -24,7 +24,10 @@
 #include <stdint.h>
 constexpr uint8_t  err_okay = 0;
 constexpr uint8_t  err_bad_op = 1;
-constexpr uint8_t  err_bad_port = 2;
-constexpr uint8_t  err_bad_range = 3;
-constexpr uint8_t  err_recv_fault = 128;   //uart bus error
+constexpr uint8_t  err_bad_port = 2;        //invalid port number
+constexpr uint8_t  err_bad_register = 3;
+constexpr uint8_t  err_bad_channel = 3;     //invalid channel number
+constexpr uint8_t  err_busy_channel = 4;    //channel is already in use
+constexpr uint8_t  err_bad_func = 3;        //invalid function
+constexpr uint8_t  err_recv_fault = 128;    //uart bus error
 #endif

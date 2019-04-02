@@ -29,87 +29,84 @@ class device
   uint8_t  m_run_bit:1;
   uint8_t  m_wait_bit:1;
   uint8_t  m_reset_bit:1;
-  uint8_t  m_error_bit:1;
+  uint8_t  m_ready_bit:1;
   uint8_t  m_nothing;
-  uint16_t m_phase_ctr;
+  uint8_t  m_phase_ctr;
 
   protected:
-  class virtual_t: public channel
+  class virtual_t
   {
-    union {
-      uint8_t v[12];
-    } m_data;
+    uint8_t m_value;
     public:
-          virtual_t() noexcept;
-          ~virtual_t();
+            virtual_t() noexcept;
+            ~virtual_t();
+            uint8_t get() const noexcept;
+            void   set(uint8_t) noexcept;
+            uint8_t* get_ptr() noexcept;
   };
 
   class digital_out_t: public channel
   {
     union {
       struct {
-        uint8_t*  m_period;
-        uint8_t*  m_phase;
-      } x;
-      uint8_t v[12];
+        uint8_t  period;
+        uint8_t  phase;
+        uint8_t* input;
+        pin_t    output;
+      } counter;
+      char  bytes[32];
     } m_data;
-
-    protected:
-    static  void  f_sync_null(digital_out_t*) noexcept;
-    static  void  f_sync_clock(digital_out_t*) noexcept;
-    static  void  f_sync_data(digital_out_t*) noexcept;
-    static  void  f_sync_spi(digital_out_t*) noexcept;
-    static  void  f_sync_motor(digital_out_t*) noexcept;
-    static  void  f_sync_soft_pwm(digital_out_t*) noexcept;
-
+  
     public:
             digital_out_t() noexcept;
             ~digital_out_t();
+            bool  setup(device*, uint8_t) noexcept;
+            void  sync(unsigned int) noexcept;
   };
 
   class analog_in_t: public channel
   {
-    union {
-      uint8_t v[12];
-    } m_data;
     public:
-          analog_in_t() noexcept;
-          ~analog_in_t();
+            analog_in_t() noexcept;
+            ~analog_in_t();
+            void setup(device*, uint8_t);
+            void sync(unsigned int) noexcept;
   };
 
   class analog_out_t: public channel
   {
-    union {
-      uint8_t v[12];
-    } m_data;
     public:
-          analog_out_t() noexcept;
-          ~analog_out_t();
+            analog_out_t() noexcept;
+            ~analog_out_t();
+            bool setup(device*, uint8_t) noexcept;
+            void sync(unsigned int) noexcept;
   };
 
-  static constexpr unsigned int phase_min = 0;
-  static constexpr unsigned int phase_max = 256;
-  static constexpr unsigned int phase_step = 32;
+  static constexpr unsigned int virtual_channel_count = 32;
+  static constexpr unsigned int digital_channel_count = 4;
+  static constexpr unsigned int analog_input_count = 8;
+  static constexpr unsigned int analog_output_count = 4;
+  
+  protected:
+  virtual_t     m_virtual[virtual_channel_count];
+  digital_out_t m_digital[digital_channel_count];
+  analog_in_t   m_analog_in[analog_input_count];
+  analog_out_t  m_analog_out[analog_output_count];
 
   protected:
-  virtual_t     m_virtual[16];
-  digital_out_t m_digital[4];
-  analog_in_t   m_analog_in[8];
-  analog_out_t  m_analog_out[4];
+          port_t*  get_port(uint8_t) noexcept;
+          virtual_t*  get_register(uint8_t) noexcept;
+          digital_out_t*  get_digital_out(uint8_t) noexcept;
+          analog_in_t*  get_analog_in(uint8_t) noexcept;
+          analog_out_t*  get_analog_out(uint8_t) noexcept;
+          bool  get_io_pin(pin_t&) noexcept;
 
-  protected:
-          uint8_t get_channel(uint8_t) noexcept;
-          uint8_t get_register(uint8_t) noexcept;
           bool  acknowledge() noexcept;
-          int   emit(uint8_t) noexcept;
-          int   emit(uint8_t*, unsigned long int) noexcept;
-          bool  expect(uint8_t, uint8_t, uint8_t, uint8_t) noexcept;
-          bool  expect() noexcept;
           void  recall() noexcept;
           void  reset() noexcept;
           void  restore() noexcept;
           void  save() noexcept;
-          void  error(uint8_t, ...) noexcept;
+          bool  error(uint8_t, ...) noexcept;
           void  recover() noexcept;
           void  setup() noexcept;
 

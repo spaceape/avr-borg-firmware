@@ -24,25 +24,49 @@
 #include <stdint.h>
 
 /* requests
+   op + argc
 */
 constexpr uint8_t  nop = 0;
 constexpr uint8_t  op_resume = 8;
-constexpr uint8_t  op_set_mode = 16;
-constexpr uint8_t  op_get_bit = 24;
-constexpr uint8_t  op_set_bit = 32;
-constexpr uint8_t  op_clr_bit = 40;
-constexpr uint8_t  op_get_analog = 48;
-constexpr uint8_t  op_set_analog = 56;
-constexpr uint8_t  op_wait = 216;        //step with clock input
+constexpr uint8_t  op_get_mode = 16;
+constexpr uint8_t  op_set_mode = 24;
+constexpr uint8_t  op_get_bit = 32;
+constexpr uint8_t  op_set_bit = 40;
+constexpr uint8_t  op_clr_bit = 48;
+constexpr uint8_t  op_get_analog = 56;
+constexpr uint8_t  op_set_analog = 64;
+constexpr uint8_t  op_get_register = 72;
+constexpr uint8_t  op_set_register = 80;
+constexpr uint8_t  op_set_input = 96;
+constexpr uint8_t  op_set_output = 104;
+constexpr uint8_t  op_set_function = 112;      //<op_set_function> <channel> <function>
+constexpr uint8_t  op_clr_function = 120;
+constexpr uint8_t  op_wait = 216;             //step with clock input
 constexpr uint8_t  op_suspend = 224;
-constexpr uint8_t  op_zero = 232;        //zero all outputs
-constexpr uint8_t  op_reset = 240;       //reset configuration
-constexpr uint8_t  op_halt = 248;        //save configuration and sleep
+constexpr uint8_t  op_zero = 232;             //zero all outputs
+constexpr uint8_t  op_reset = 240;            //reset configuration
+constexpr uint8_t  op_halt = 248;             //save configuration and sleep
 constexpr uint8_t _op = 248;
-constexpr uint8_t _index = 7;
+constexpr uint8_t _argc = 7;
+
+constexpr uint8_t  at_port = 0;
+constexpr uint8_t  at_register = 128;
+constexpr uint8_t  ac_digital = 32;
+constexpr uint8_t  ac_analog = 64;
+constexpr uint8_t _at_class = 96;
+constexpr uint8_t _at_index = 31;
+
+constexpr uint8_t  fn_none = 0;
+constexpr uint8_t  fn_pulse = 1;
+constexpr uint8_t  fn_data = 2;
+constexpr uint8_t  fn_soft_pwm = 3;
+constexpr uint8_t  fn_soft_spi = 4;
+constexpr uint8_t  fn_3_phase = 5;
+constexpr uint8_t  fn_4_phase = 6;
 
 /* responses
 */
-constexpr uint8_t  tag_error = 0;
+constexpr uint8_t  tag_response = 127;
 constexpr uint8_t  tag_acknowledge = 170;
+constexpr uint8_t  tag_error = 0;
 #endif

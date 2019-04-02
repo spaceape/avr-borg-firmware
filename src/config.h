@@ -35,4 +35,5 @@
 constexpr bool enable_gpr = true;
 constexpr bool enable_digital = true;
 constexpr bool enable_analog = true;
+constexpr bool enable_acknowledge = true;
 #endif

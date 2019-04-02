@@ -62,7 +62,8 @@ constexpr uint8_t get_UBRR_h(uint32_t baud = BAUD, bool use_2x = true) {
 }
 
 constexpr unsigned long int get_baud_timeout(uint32_t baud = BAUD, bool use_2x = true) {
-      return get_baud_delay(baud, use_2x) * 256;
+      //return get_baud_delay(baud, use_2x) * 8;
+      return 256;
 }
 
 constexpr unsigned long int recv_timeout_min = 1;
@@ -72,25 +73,19 @@ void  init(uint32_t = BAUD, bool = USE_2X) noexcept;
 
 bool  recv(uint8_t*) noexcept;
 bool  recv(uint8_t&) noexcept;
-bool  recv_wait(uint8_t*, volatile unsigned long int) noexcept;
-bool  recv_wait(uint8_t&, volatile unsigned long int) noexcept;
+bool  recv_wait(uint8_t*, unsigned long int) noexcept;
+bool  recv_wait(uint8_t&, unsigned long int) noexcept;
 
-inline  bool  recv_le() noexcept {
-        return true;
+inline  bool  recv_le(uint8_t* value) noexcept {
+        return recv_wait(value, recv_timeout_default);
 }
 
-template<typename... Args>
-inline  bool  recv_le(uint8_t* value, Args&&... args) noexcept {
-        return recv_wait(value, recv_timeout_default) && recv_le(std::forward<Args>(args)...);
+inline  bool  recv_le(uint8_t& value) noexcept {
+        return recv_wait(value, recv_timeout_default);
 }
 
-template<typename... Args>
-inline  bool  recv_le(uint8_t& value, Args&&... args) noexcept {
-        return recv_wait(value, recv_timeout_default) && recv_le(std::forward<Args>(args)...);
-}
-
-template<typename Xt, typename... Args>
-inline  bool  recv_le(Xt* value, Args&&... args) noexcept {
+template<typename Xt>
+inline  bool  recv_le(Xt* value) noexcept {
         uint8_t* data = reinterpret_cast<uint8_t*>(value);
         uint8_t* last = data + sizeof(Xt);
         while(data < last) {
@@ -99,17 +94,17 @@ inline  bool  recv_le(Xt* value, Args&&... args) noexcept {
             }
             data++;
         }
-        return recv_le(std::forward<Args>(args)...);
+        return true;
+}
+
+template<typename Xt>
+inline  bool  recv_le(Xt& value) noexcept {
+        return recv_le(std::addressof(value));
 }
 
 template<typename Xt, typename... Args>
 inline  bool  recv_le(Xt& value, Args&&... args) noexcept {
-        return recv_le(std::addressof(value)) && recv_le(std::forward<Args>(args)...);
-}
-
-inline  bool  recv_be() noexcept
-{
-        return true;
+        return recv_le(value) && recv_le(std::forward<Args>(args)...);
 }
 
 inline  bool  recv_be(uint8_t* value) noexcept {
@@ -120,8 +115,8 @@ inline  bool  recv_be(uint8_t& value) noexcept {
         return recv_wait(value, recv_timeout_default);
 }
 
-template<typename Xt, typename... Args>
-inline  bool  recv_be(Xt* value, Args&&... args) noexcept {
+template<typename Xt>
+inline  bool  recv_be(Xt* value) noexcept {
         uint8_t* last = reinterpret_cast<uint8_t*>(value) - 1;
         uint8_t* data = last + sizeof(Xt);
         while(data > last) {
@@ -130,12 +125,17 @@ inline  bool  recv_be(Xt* value, Args&&... args) noexcept {
             }
             data--;
         }
-        return recv_be(std::forward<Args>(args)...);
+        return true;
+}
+
+template<typename Xt>
+inline  bool  recv_be(Xt& value) noexcept {
+        return recv_be(std::addressof(value));
 }
 
 template<typename Xt, typename... Args>
 inline  bool  recv_be(Xt& value, Args&&... args) noexcept {
-        return recv_be(std::addressof(value)) && recv_be(std::forward<Args>(args)...);
+        return recv_be(value) && recv_be(std::forward<Args>(args)...);
 }
 
 inline  bool  get_uint8(uint8_t& value) noexcept {
@@ -167,35 +167,23 @@ inline  bool  recv(Xt& value, Args&&... args) noexcept {
 void  send(uint8_t) noexcept;
 
 template<typename Xt>
-inline  void  send(Xt& value) noexcept {
-        uint8_t* data = reinterpret_cast<uint8_t*>(std::addressof(value));
-        uint8_t* last = data + sizeof(value);
-        while(data < last) {
-            send(data[0]);
-            data++;
-        }
+void  send(Xt&) noexcept {
 }
 
 template<typename Xt>
-inline  void  send(const Xt& value) noexcept {
-        const uint8_t* data = reinterpret_cast<const uint8_t*>(std::addressof(value));
-        const uint8_t* last = data + sizeof(value);
-        while(data < last) {
-            send(data[0]);
-            data++;
-        }
+void  send(const Xt&) noexcept {
 }
 
 template<typename Xt, typename... Args>
-inline  void  send(Xt& value, Args&&... args) noexcept {
-        send(value);
-        send(std::forward<Args>(args)...);
+void  send(Xt& value, Args&&... args) noexcept {
+      send(value);
+      send(std::forward<Args>(args)...);
 }
 
 template<typename Xt, typename... Args>
-inline  void  send(const Xt& value, Args&&... args) noexcept {
-        send(value);
-        send(std::forward<Args>(args)...);
+void  send(const Xt& value, Args&&... args) noexcept {
+      send(value);
+      send(std::forward<Args>(args)...);
 }
 
 void  drop() noexcept;

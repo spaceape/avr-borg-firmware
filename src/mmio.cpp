@@ -25,24 +25,19 @@ namespace mmio {
 
 void init() noexcept
 {
-      TCNT2  = 0;
-      TCCR2A = 0;
-      TCCR2B = 3;     //F_CPU / 32 prescaler
-      TIMSK2 =_BV(TOIE2);
-      sei();
 }
 
-volatile uint8_t& get_gpio_pin(uint8_t index) noexcept
+port_t& get_gpio_pin(uint8_t index) noexcept
 {
       return _SFR_IO8(0 + index * 3);
 }
 
-volatile uint8_t& get_gpio_port(uint8_t index) noexcept
+port_t& get_gpio_port(uint8_t index) noexcept
 {
       return _SFR_IO8(2 + index * 3);
 }
 
-volatile uint8_t& get_gpio_mode(uint8_t index) noexcept
+port_t& get_gpio_mode(uint8_t index) noexcept
 {
       return _SFR_IO8(1 + index * 3);
 }

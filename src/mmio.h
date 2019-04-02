@@ -54,6 +54,21 @@ static constexpr unsigned long int gpio_max = 1;
 static constexpr unsigned long int gpio_max = 7;
 #endif
 
+/*bits each port has*/
+static constexpr unsigned long int gpio_port_size = 8;
+
+/*bits all present ports have in total*/
+static constexpr unsigned long int gpio_size = gpio_port_size * (gpio_max - gpio_min);
+
+using  port_t = volatile uint8_t;
+
+struct pin_t
+{
+  port_t*  m_port;
+  uint8_t  m_bit;
+  uint8_t  m_aux;
+};
+
 namespace mmio {
 
 void init() noexcept;
@@ -66,9 +81,9 @@ constexpr uint8_t get_gpio_max() noexcept {
       return gpio_max;
 }
 
-volatile uint8_t& get_gpio_pin(uint8_t) noexcept;
-volatile uint8_t& get_gpio_port(uint8_t) noexcept;
-volatile uint8_t& get_gpio_mode(uint8_t) noexcept;
+port_t& get_gpio_pin(uint8_t) noexcept;
+port_t& get_gpio_port(uint8_t) noexcept;
+port_t& get_gpio_mode(uint8_t) noexcept;
 void drop() noexcept;
 
 /*namespace mmio*/ }

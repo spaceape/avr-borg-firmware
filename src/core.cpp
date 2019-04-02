@@ -36,9 +36,19 @@ ISR(TIMER2_OVF_vect)
 
 int   main(void)
 {
+
       mmio::init();
       uart::init();
+      /*setup timer interrupt for device::sync()*/
+      DDRB |=_BV(PORTB5);
+      TCNT2  = 0;
+      TCCR2A = 0;
+      TCCR2B = 2;     //F_CPU / 32 prescaler
+      TIMSK2 =_BV(TOIE2);
+      sei();
+      /*enter main loop*/
       l_device.loop();
+      /*shutdown - should never reach*/
       uart::drop();
       mmio::drop();
       return 0;

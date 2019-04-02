@@ -22,58 +22,18 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <firmware.h>
-
-using  func_type = void(*)(void);
+#include <mmio.h>
 
 struct channel
 {
-  uint8_t  m_type;
   uint8_t  m_busy:1;
   uint8_t  m_enable:1;
-
-  protected:
-  void*    m_value;
+  uint8_t  m_function;
 
   public:
           channel() noexcept;
           ~channel();
+          bool has_function() const noexcept;
+          bool has_function(uint8_t) const noexcept;
 };
-
-// class  channel
-// {
-//   int8_t    m_type;
-//   int8_t    m_mode;
-//   int8_t    m_xxx;
-//   int8_t    m_xxy;
-//   int8_t*   m_input;
-//   int8_t*   m_output;
-//   int8_t*   m_period;
-//   int8_t*   m_phase;
-//   func_type m_func;
-//   func_type m_sync;
-
-//   protected:
-//   public:
-//   static constexpr uint8_t typ_undef = 0;
-//   static constexpr uint8_t typ_reg = 0x20;
-//   static constexpr uint8_t typ_bit = 0x40;
-//   static constexpr uint8_t typ_pwm = 0x60;
-//   static constexpr uint8_t typ_in  = 0;
-//   static constexpr uint8_t typ_out = 0x10;
-
-//   static constexpr uint8_t mode_undef = 0;
-//   static constexpr uint8_t mode_enabled = 1;
-//   static constexpr uint8_t mode_input = 4;
-//   static constexpr uint8_t mode_output = 6;
-
-//   public:
-//           channel() noexcept;
-//           channel(int8_t, int8_t, unsigned long int = 0, unsigned long int = 0) noexcept;
-//           ~channel();
-//           void run() noexcept;
-//           void reset() noexcept;
-//           void pause() noexcept;
-//           void stop() noexcept;
-//           void sync() noexcept;
-// };
 #endif

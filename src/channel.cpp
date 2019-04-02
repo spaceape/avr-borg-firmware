@@ -20,12 +20,12 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "channel.h"
+#include "command.h"
 
       channel::channel() noexcept:
-      m_type(0),
       m_busy(0),
       m_enable(0),
-      m_value(nullptr)
+      m_function(fn_none)
 {
 }
 
@@ -33,31 +33,12 @@
 {
 }
 
+bool  channel::has_function() const noexcept
+{
+      return m_function;
+}
 
-//       channel::channel() noexcept:
-//       m_type(0),
-//       m_mode(0),
-//       m_input(nullptr),
-//       m_output(nullptr),
-//       m_period(nullptr),
-//       m_phase(nullptr)
-// {
-// }
-
-//       channel::channel(int8_t type, int8_t mode, unsigned long int pi, unsigned long int po) noexcept:
-//       m_type(type),
-//       m_mode(mode),
-//       m_input(reinterpret_cast<int8_t*>(pi)),
-//       m_output(reinterpret_cast<int8_t*>(po)),
-//       m_period(nullptr),
-//       m_phase(nullptr)
-// {
-// }
-    
-//       channel::~channel()
-// {
-// }
-
-// void  channel::sync() noexcept
-// {
-// }
+bool  channel::has_function(uint8_t function) const noexcept
+{
+      return m_function == function;
+}

@@ -36,22 +36,23 @@ void  init(uint32_t baud, bool use_2x) noexcept
       UCSR0B =_BV(RXEN0) |_BV(TXEN0);   /* Enable RX and TX */
 }
 
-void  send(uint8_t value) noexcept
+bool recv(uint8_t* value) noexcept
 {
-      loop_until_bit_is_set(UCSR0A, UDRE0);
-      UDR0 = value;
-    //loop_until_bit_is_set(UCSR0A, TXC0); /* Wait until transmission ready. */
+      loop_until_bit_is_set(UCSR0A, RXC0);
+      *value = UDR0;
+      return   true;
 }
 
-uint8_t recv() noexcept
+bool recv(uint8_t& value) noexcept
 {
-      loop_until_bit_is_set(UCSR0A, RXC0); /* Wait until data exists. */
-      return UDR0;
+      loop_until_bit_is_set(UCSR0A, RXC0);
+      value  = UDR0;
+      return   true;
 }
 
-bool recv(uint8_t* value, unsigned long int timeout) noexcept
+bool recv_wait(uint8_t* value, volatile unsigned long int timeout) noexcept
 {
-      while(timeout) {
+      while(1) {
           if(bit_is_set(UCSR0A, RXC0)) {
               *value = UDR0;
               return true;
@@ -61,9 +62,9 @@ bool recv(uint8_t* value, unsigned long int timeout) noexcept
       return false;
 }
 
-bool recv(uint8_t& value, unsigned long int timeout) noexcept
+bool recv_wait(uint8_t& value, volatile unsigned long int timeout) noexcept
 {
-      while(timeout) {
+      while(1) {
           if(bit_is_set(UCSR0A, RXC0)) {
               value = UDR0;
               return true;
@@ -71,6 +72,13 @@ bool recv(uint8_t& value, unsigned long int timeout) noexcept
           timeout--;
       }
       return false;
+}
+
+void  send(uint8_t value) noexcept
+{
+      loop_until_bit_is_set(UCSR0A, UDRE0);
+      UDR0 = value;
+    //loop_until_bit_is_set(UCSR0A, TXC0); /* Wait until transmission ready. */
 }
 
 void  drop() noexcept
