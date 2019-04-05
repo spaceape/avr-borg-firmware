@@ -25,6 +25,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+static constexpr unsigned long int admux_min = 0;
+static constexpr unsigned long int admux_max = 7;
+
 /* determine gpio_min and gpio_max
  * NOTE: not necesarily the best way to do it
 */
@@ -81,9 +84,13 @@ constexpr uint8_t get_gpio_max() noexcept {
       return gpio_max;
 }
 
-port_t& get_gpio_pin(uint8_t) noexcept;
-port_t& get_gpio_port(uint8_t) noexcept;
-port_t& get_gpio_mode(uint8_t) noexcept;
+port_t&   get_gpio_pin(uint8_t) noexcept;
+port_t&   get_gpio_port(uint8_t) noexcept;
+port_t&   get_gpio_mode(uint8_t) noexcept;
+port_t&   get_ad_mux() noexcept;
+void      set_ad_mux(uint8_t) noexcept;
+uint16_t  get_ad_value() noexcept;
+
 void drop() noexcept;
 
 /*namespace mmio*/ }

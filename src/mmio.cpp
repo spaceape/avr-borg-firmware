@@ -42,6 +42,23 @@ port_t& get_gpio_mode(uint8_t index) noexcept
       return _SFR_IO8(1 + index * 3);
 }
 
+port_t&   get_ad_mux() noexcept
+{
+      return ADMUX;
+}
+
+void  set_ad_mux(uint8_t value) noexcept
+{
+      ADMUX = (ADMUX & 0xf8) + (value & 0x07);
+}
+
+uint16_t  get_ad_value() noexcept
+{
+      ADCSRA |=_BV(ADSC);
+      loop_until_bit_is_clear(ADCSRA, ADSC);
+      return ADC;
+}
+
 void drop() noexcept
 {
 }

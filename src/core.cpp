@@ -36,15 +36,21 @@ ISR(TIMER2_OVF_vect)
 
 int   main(void)
 {
+      /*configure digital i/o*/
+      DDRB =_BV(PORTB5);
+
+      /*configure analog i/o*/
+      ADMUX =_BV(REFS0);      //AREF = AVcc
+      ADCSRA =_BV(ADEN) | 7;  //ADC Enable + F_CPU / 128 prescaler
+
+      /*setup timer interrupt for device::sync()*/
+      TCNT2 = 0;
+      TCCR2A = 0;
+      TCCR2B = 2;             //Timer2 F_CPU / 32 prescaler
+      TIMSK2 =_BV(TOIE2);
 
       mmio::init();
       uart::init();
-      /*setup timer interrupt for device::sync()*/
-      DDRB |=_BV(PORTB5);
-      TCNT2  = 0;
-      TCCR2A = 0;
-      TCCR2B = 2;     //F_CPU / 32 prescaler
-      TIMSK2 =_BV(TOIE2);
       sei();
       /*enter main loop*/
       l_device.loop();

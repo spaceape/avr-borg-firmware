@@ -100,7 +100,6 @@ class device
           analog_in_t*  get_analog_in(uint8_t) noexcept;
           analog_out_t*  get_analog_out(uint8_t) noexcept;
           bool  get_io_pin(pin_t&) noexcept;
-
           bool  acknowledge() noexcept;
           void  recall() noexcept;
           void  reset() noexcept;

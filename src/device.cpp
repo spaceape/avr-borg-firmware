@@ -74,65 +74,13 @@ void  device::virtual_t::set(uint8_t value) noexcept
 {
 }
 
-bool  device::digital_out_t::setup(device* root, uint8_t function) noexcept
+bool  device::digital_out_t::setup(device*, uint8_t) noexcept
 {
-      switch(m_function) {
-        case fn_none: {
-        }
-            break;
-        case fn_pulse: {
-              bool b0 = uart::recv(m_data.counter.period, m_data.counter.phase);
-              if(root) {
-                  bool b1 = root->get_io_pin(m_data.counter.output);
-                  if(b1) {
-                  }
-              }
-        }
-            break;
-        case fn_data: {
-        }
-            break;
-        case fn_soft_pwm: {
-        }
-            break;
-        case fn_soft_spi: {
-        }
-            break;
-        case fn_3_phase: {
-        }
-            break;
-        case fn_4_phase: {
-        }
-            break;
-      }
       return false;
 }
 
 void  device::digital_out_t::sync(unsigned int) noexcept
 {
-      switch(m_function) {
-        case fn_none: {
-        }
-            break;
-        case fn_pulse: {
-        }
-            break;
-        case fn_data: {
-        }
-            break;
-        case fn_soft_pwm: {
-        }
-            break;
-        case fn_soft_spi: {
-        }
-            break;
-        case fn_3_phase: {
-        }
-            break;
-        case fn_4_phase: {
-        }
-            break;
-      }
 }
 
       device::analog_in_t::analog_in_t() noexcept:
@@ -267,8 +215,6 @@ bool  device::error(uint8_t code, ...) noexcept
 {
       uart::send(tag_error);
       uart::send(code);
-      uart::send(0);
-      uart::send(0);
       m_ready_bit = 0;
       return false;
 }
@@ -300,7 +246,7 @@ void  device::loop() noexcept
                     if(uart::recv(port)) {
                         if(port >= gpio_min) {
                             if(port <= gpio_max) {
-                                uart::send(tag_response, op, mmio::get_gpio_mode(port));
+                                uart::send(opand(op, 1), mmio::get_gpio_mode(port));
                             } else
                                 error(err_bad_port, port);
                         } else
@@ -329,7 +275,7 @@ void  device::loop() noexcept
                     if(uart::recv(port)) {
                         if(port >= gpio_min) {
                             if(port <= gpio_max) {
-                                uart::send(tag_response, op, mmio::get_gpio_pin(port));
+                                uart::send(opand(op, 1), mmio::get_gpio_pin(port));
                             } else
                                 error(err_bad_port, port);
                         } else
@@ -368,13 +314,24 @@ void  device::loop() noexcept
                         error(err_recv_fault);
                 }
                       break;
+                case op_get_analog:
+                    uint8_t pin;
+                    if(uart::recv(pin)) {
+                        if(pin <= admux_max) {
+                            mmio::set_ad_mux(pin);
+                            uart::send(opand(op, 2), mmio::get_ad_value());
+                        } else
+                            error(err_bad_port, pin);
+                    } else
+                        error(err_recv_fault);
+                      break;
                 case op_set_analog:
                       break;
                 case op_get_register: {
                     uint8_t reg;
                     if(uart::recv(reg)) {
                         if(reg < virtual_channel_count) {
-                            uart::send(tag_response, op, m_virtual[reg].get());
+                            uart::send(opand(op, 1), m_virtual[reg].get());
                         } else
                             error(err_bad_register, reg);
                     } else
@@ -437,13 +394,13 @@ void  device::loop() noexcept
                       if(uart::recv(channel, function)) {
                           if(channel & ac_digital) {
                               if(channel < digital_channel_count) {
-                                 //m_analog_out[channel].set_function();
+                                 m_digital[channel].setup(this, fn_none);
                               } else
                                   error(err_bad_channel);
                           } else
                           if(channel & ac_analog) {
                               if(channel < analog_output_count) {
-                                  //m_analog_out[channel].set_function();
+                                  m_analog_out[channel].setup(this, fn_none);
                               } else
                                   error(err_bad_channel);
                           } else
